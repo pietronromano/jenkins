@@ -1,0 +1,83 @@
+Warning: no key algorithms provided; JENKINS-42959 disabled
+SSHLauncher{host='40.68.83.9', port=22, credentialsId='dc371951-f036-4a37-92ad-bdf26e664a12', jvmOptions='', javaPath='', prefixStartSlaveCmd='', suffixStartSlaveCmd='', launchTimeoutSeconds=60, maxNumRetries=10, retryWaitTime=15, sshHostKeyVerificationStrategy=hudson.plugins.sshslaves.verifiers.KnownHostsFileKeyVerificationStrategy, tcpNoDelay=true, trackCredentials=true}
+[09/16/23 16:38:36] [SSH] Opening SSH connection to 40.68.83.9:22.
+Searching for 40.68.83.9 in /var/lib/jenkins/.ssh/known_hosts
+Searching for 40.68.83.9:22 in /var/lib/jenkins/.ssh/known_hosts
+[09/16/23 16:38:36] [SSH] SSH host key matches key in Known Hosts file. Connection will be allowed.
+[09/16/23 16:38:37] [SSH] Authentication successful.
+[09/16/23 16:38:37] [SSH] The remote user's environment is:
+BASH=/usr/bin/bash
+BASHOPTS=checkwinsize:cmdhist:complete_fullquote:extquote:force_fignore:globasciiranges:hostcomplete:interactive_comments:progcomp:promptvars:sourcepath
+BASH_ALIASES=()
+BASH_ARGC=([0]="0")
+BASH_ARGV=()
+BASH_CMDS=()
+BASH_EXECUTION_STRING=set
+BASH_LINENO=()
+BASH_SOURCE=()
+BASH_VERSINFO=([0]="5" [1]="1" [2]="16" [3]="1" [4]="release" [5]="x86_64-pc-linux-gnu")
+BASH_VERSION='5.1.16(1)-release'
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+DIRSTACK=()
+EUID=1000
+GROUPS=()
+HOME=/home/azureuser
+HOSTNAME=jenkins-agent-vm
+HOSTTYPE=x86_64
+IFS=$' \t\n'
+LANG=C.UTF-8
+LOGNAME=azureuser
+MACHTYPE=x86_64-pc-linux-gnu
+MOTD_SHOWN=pam
+OPTERR=1
+OPTIND=1
+OSTYPE=linux-gnu
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+PIPESTATUS=([0]="0")
+PPID=7918
+PS4='+ '
+PWD=/home/azureuser
+SHELL=/bin/bash
+SHELLOPTS=braceexpand:hashall:interactive-comments
+SHLVL=1
+SSH_CLIENT='51.136.28.189 34284 22'
+SSH_CONNECTION='51.136.28.189 34284 10.0.0.4 22'
+TERM=dumb
+UID=1000
+USER=azureuser
+XDG_RUNTIME_DIR=/run/user/1000
+XDG_SESSION_CLASS=user
+XDG_SESSION_ID=25
+XDG_SESSION_TYPE=tty
+_=']'
+Checking Java version in the PATH
+openjdk version "11.0.20.1" 2023-08-24
+OpenJDK Runtime Environment (build 11.0.20.1+1-post-Ubuntu-0ubuntu122.04)
+OpenJDK 64-Bit Server VM (build 11.0.20.1+1-post-Ubuntu-0ubuntu122.04, mixed mode, sharing)
+[09/16/23 16:38:37] [SSH] Checking java version of /home/azureuser/jenkins-work/jdk/bin/java
+Couldn't figure out the Java version of /home/azureuser/jenkins-work/jdk/bin/java
+bash: line 1: /home/azureuser/jenkins-work/jdk/bin/java: No such file or directory
+
+[09/16/23 16:38:37] [SSH] Checking java version of java
+[09/16/23 16:38:37] [SSH] java -version returned 11.0.20.1.
+[09/16/23 16:38:37] [SSH] Starting sftp client.
+[09/16/23 16:38:37] [SSH] Copying latest remoting.jar...
+[09/16/23 16:38:37] [SSH] Copied 1,371,113 bytes.
+Expanded the channel window size to 4MB
+[09/16/23 16:38:37] [SSH] Starting agent process: cd "/home/azureuser/jenkins-work" && java  -jar remoting.jar -workDir /home/azureuser/jenkins-work -jar-cache /home/azureuser/jenkins-work/remoting/jarCache
+Sep 16, 2023 4:38:38 PM org.jenkinsci.remoting.engine.WorkDirManager initializeWorkDir
+INFO: Using /home/azureuser/jenkins-work/remoting as a remoting work directory
+Sep 16, 2023 4:38:38 PM org.jenkinsci.remoting.engine.WorkDirManager setupLogging
+INFO: Both error and output logs will be printed to /home/azureuser/jenkins-work/remoting
+<===[JENKINS REMOTING CAPACITY]===>channel started
+Remoting version: 3131.vf2b_b_798b_ce99
+Launcher: SSHLauncher
+Communication Protocol: Standard in/out
+This is a Unix agent
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by jenkins.slaves.StandardOutputSwapper$ChannelSwapper to constructor java.io.FileDescriptor(int)
+WARNING: Please consider reporting this to the maintainers of jenkins.slaves.StandardOutputSwapper$ChannelSwapper
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+Evacuated stdout
+Agent successfully connected and online

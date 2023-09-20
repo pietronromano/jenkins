@@ -1,0 +1,42 @@
+Started by user Pietro Nicholas Romano
+Running as SYSTEM
+Building in workspace /var/lib/jenkins/workspace/nodeapp
+The recommended git tool is: NONE
+No credentials specified
+Cloning the remote Git repository
+Cloning repository https://github.com/wardviaene/docker-demo.git
+ > git init /var/lib/jenkins/workspace/nodeapp # timeout=10
+Fetching upstream changes from https://github.com/wardviaene/docker-demo.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.34.1'
+ > git fetch --tags --force --progress -- https://github.com/wardviaene/docker-demo.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git config remote.origin.url https://github.com/wardviaene/docker-demo.git # timeout=10
+ > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
+Avoid second fetch
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+Checking out Revision 0d49c52c3aa393aa570a75ed35cdfa23bf124eab (refs/remotes/origin/master)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 0d49c52c3aa393aa570a75ed35cdfa23bf124eab # timeout=10
+Commit message: "bump mysql to mysql2 in nodejs"
+First time build. Skipping changelog.
+Unpacking https://nodejs.org/dist/v20.6.1/node-v20.6.1-linux-x64.tar.gz to /var/lib/jenkins/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/nodejs on Jenkins
+[nodeapp] $ /bin/sh -xe /tmp/jenkins3758060013704681244.sh
++ npm install
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'myapp@0.0.1',
+npm WARN EBADENGINE   required: { node: '^4.6.1' },
+npm WARN EBADENGINE   current: { node: 'v20.6.1', npm: '9.8.1' }
+npm WARN EBADENGINE }
+
+added 96 packages, and audited 97 packages in 5s
+
+7 vulnerabilities (4 high, 3 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+Finished: SUCCESS

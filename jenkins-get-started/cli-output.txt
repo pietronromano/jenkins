@@ -1,0 +1,635 @@
+$ az group create --name $rg --location westeurope
+{
+  "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg",        
+  "location": "westeurope",
+  "managedBy": null,
+  "name": "jenkins-get-started-rg",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": null,
+  "type": "Microsoft.Resources/resourceGroups"
+}
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$   az vm create \
+>   --resource-group $rg \
+>   --name $vm \
+>   --image Ubuntu2204 \
+>   --admin-username "azureuser" \
+>   --generate-ssh-keys \
+>   --public-ip-sku Standard \
+>   --custom-data cloud-init-jenkins.txt
+Selecting "uksouth" may reduce your costs. The region you've selected may cost more for the same services. You can disable this message in the future with the command "az config set core.display_region_identified=false". Learn more at https://go.microsoft.com/fwlink/?linkid=222571
+Ignite (November) 2023 onwards "az vm/vmss create" command will deploy Gen2-Trusted Launch VM by default. To know more about the default change and Trusted Launch, please visit https://aka.ms/TLaD
+{
+  "fqdns": "",
+  "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Compute/virtualMachines/jenkins-get-started-vm",
+  "location": "westeurope",
+  "macAddress": "60-45-BD-88-C6-0A",
+  "powerState": "VM running",
+  "privateIpAddress": "10.0.0.4",
+  "publicIpAddress": "52.137.17.122",
+  "resourceGroup": "jenkins-get-started-rg",
+  "zones": ""
+}
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$   az vm list -d -o table --query "[?name=='jenkins-get-started-vm']"
+Name                    Location    ProvisioningState    VmId                                  TimeCreated                       PowerState    PublicIps      Fqdns    PrivateIps    MacAddresses       ResourceGroup   
+----------------------  ----------  -------------------  ------------------------------------  --------------------------------  ------------  -------------  -------  ------------  -----------------  ----------------------
+jenkins-get-started-vm  westeurope  Succeeded            cf24828d-61ba-4c6c-af55-b84c5bbd1ef4  2023-09-13T07:55:44.742427+00:00  VM running    52.137.17.122           10.0.0.4      60-45-BD-88-C6-0A  JENKINS-GET-STARTED-RG
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$   az vm open-port \
+>   --resource-group $rg \
+>   --name $vm  \
+>   --port 8080 --priority 1010
+{
+  "defaultSecurityRules": [
+    {
+      "access": "Allow",
+      "description": "Allow inbound traffic from all VMs in VNET",
+      "destinationAddressPrefix": "VirtualNetwork",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"483d5770-de5c-4a96-96fd-65b3524b45a5\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/AllowVnetInBound",
+      "name": "AllowVnetInBound",
+      "priority": 65000,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "VirtualNetwork",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow inbound traffic from azure load balancer",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"483d5770-de5c-4a96-96fd-65b3524b45a5\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+      "name": "AllowAzureLoadBalancerInBound",
+      "priority": 65001,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "AzureLoadBalancer",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Deny",
+      "description": "Deny all inbound traffic",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"483d5770-de5c-4a96-96fd-65b3524b45a5\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/DenyAllInBound",
+      "name": "DenyAllInBound",
+      "priority": 65500,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+      "destinationAddressPrefix": "VirtualNetwork",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"483d5770-de5c-4a96-96fd-65b3524b45a5\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/AllowVnetOutBound",
+      "name": "AllowVnetOutBound",
+      "priority": 65000,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "VirtualNetwork",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow outbound traffic from all VMs to Internet",
+      "destinationAddressPrefix": "Internet",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"483d5770-de5c-4a96-96fd-65b3524b45a5\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/AllowInternetOutBound",
+      "name": "AllowInternetOutBound",
+      "priority": 65001,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Deny",
+      "description": "Deny all outbound traffic",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"483d5770-de5c-4a96-96fd-65b3524b45a5\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/DenyAllOutBound",
+      "name": "DenyAllOutBound",
+      "priority": 65500,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    }
+  ],
+  "etag": "W/\"483d5770-de5c-4a96-96fd-65b3524b45a5\"",
+  "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG",
+  "location": "westeurope",
+  "name": "jenkins-get-started-vmNSG",
+  "networkInterfaces": [
+    {
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkInterfaces/jenkins-get-started-vmVMNic",
+      "resourceGroup": "jenkins-get-started-rg"
+    }
+  ],
+  "provisioningState": "Succeeded",
+  "resourceGroup": "jenkins-get-started-rg",
+  "resourceGuid": "6f06ce1d-1c99-41e6-b084-6ff7d87bf322",
+  "securityRules": [
+    {
+      "access": "Allow",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "22",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"483d5770-de5c-4a96-96fd-65b3524b45a5\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/securityRules/default-allow-ssh",    
+      "name": "default-allow-ssh",
+      "priority": 1000,
+      "protocol": "Tcp",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules"
+    },
+    {
+      "access": "Allow",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "8080",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"483d5770-de5c-4a96-96fd-65b3524b45a5\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/securityRules/open-port-8080",       
+      "name": "open-port-8080",
+      "priority": 1010,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules"
+    }
+  ],
+  "tags": {},
+  "type": "Microsoft.Network/networkSecurityGroups"
+}
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$ ip="$(az vm show \
+>   --resource-group $rg \
+>   --name $vm -d \
+>   --query [publicIps] \
+>   --output tsv)"
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$ echo $ip
+52.137.17.122
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$ ssh azureuser@$ip
+The authenticity of host '52.137.17.122 (52.137.17.122)' can't be established.
+ED25519 key fingerprint is SHA256:Y3Hn1e8xtgG9QAs8rhZLwuoTnQAqrATAu0bzXI7FhY4.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? y
+Please type 'yes', 'no' or the fingerprint: yes
+Warning: Permanently added '52.137.17.122' (ED25519) to the list of known hosts.
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 6.2.0-1011-azure x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Wed Sep 13 08:03:23 UTC 2023
+
+  System load:  0.00439453125     Processes:             101
+  Usage of /:   7.9% of 28.89GB   Users logged in:       0
+  Memory usage: 16%               IPv4 address for eth0: 10.0.0.4
+  Swap usage:   0%
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+azureuser@jenkins-get-started-vm:~$ service jenkins status
+● jenkins.service - Jenkins Continuous Integration Server
+     Loaded: loaded (/lib/systemd/system/jenkins.service; enabled; vendor preset: enabled)
+     Active: active (running) since Wed 2023-09-13 07:58:06 UTC; 5min ago
+   Main PID: 5210 (java)
+      Tasks: 36 (limit: 4074)
+     Memory: 223.8M
+        CPU: 17.502s
+     CGroup: /system.slice/jenkins.service
+             └─5210 /usr/bin/java -Djava.awt.headless=true -jar /usr/share/java/jenkins.war --webroot=/var/>
+
+Sep 13 07:57:54 jenkins-get-started-vm jenkins[5210]: *****************************************************>
+Sep 13 07:57:54 jenkins-get-started-vm jenkins[5210]: *****************************************************>
+Sep 13 07:57:54 jenkins-get-started-vm jenkins[5210]: WARNING: An illegal reflective access operation has o>
+Sep 13 07:57:54 jenkins-get-started-vm jenkins[5210]: WARNING: Illegal reflective access by org.codehaus.gr>
+Sep 13 07:57:54 jenkins-get-started-vm jenkins[5210]: WARNING: Please consider reporting this to the mainta>
+Sep 13 07:57:54 jenkins-get-started-vm jenkins[5210]: WARNING: Use --illegal-access=warn to enable warnings>
+Sep 13 07:57:54 jenkins-get-started-vm jenkins[5210]: WARNING: All illegal access operations will be denied>
+Sep 13 07:58:06 jenkins-get-started-vm jenkins[5210]: 2023-09-13 07:58:06.474+0000 [id=29]        INFO     >
+Sep 13 07:58:06 jenkins-get-started-vm jenkins[5210]: 2023-09-13 07:58:06.498+0000 [id=22]        INFO     >
+Sep 13 07:58:06 jenkins-get-started-vm systemd[1]: Started Jenkins Continuous Integration Server.
+lines 14-20/20 (END)
+
+azureuser@jenkins-get-started-vm:~$ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+1fd973e3a93647949558b44d1bf8ec28
+azureuser@jenkins-get-started-vm:~$ az group delete -g $rg
+az: command not found
+azureuser@jenkins-get-started-vm:~$ az group delete -g $rg
+az: command not found
+azureuser@jenkins-get-started-vm:~$ az group delete -g $rg
+az: command not found
+azureuser@jenkins-get-started-vm:~$ exit
+logout
+Connection to 52.137.17.122 closed.
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$ az group delete -g $rg
+Are you sure you want to perform this operation? (y/n): y
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$   az group create --name $rg --location westeurope
+{
+  "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg",        
+  "location": "westeurope",
+  "managedBy": null,
+  "name": "jenkins-get-started-rg",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": null,
+  "type": "Microsoft.Resources/resourceGroups"
+}
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$   az vm create \
+>   --resource-group $rg \
+>   --name $vm \
+>   --image UbuntuLTS \
+>   --admin-username "azureuser" \
+>   --generate-ssh-keys \
+>   --public-ip-sku Standard \
+>   --custom-data cloud-init-jenkins.txt
+Selecting "uksouth" may reduce your costs. The region you've selected may cost more for the same services. You can disable this message in the future with the command "az config set core.display_region_identified=false". Learn more at https://go.microsoft.com/fwlink/?linkid=222571
+Ignite (November) 2023 onwards "az vm/vmss create" command will deploy Gen2-Trusted Launch VM by default. To know more about the default change and Trusted Launch, please visit https://aka.ms/TLaD
+Consider using the "Ubuntu2204" alias. On April 30, 2023,the image deployed by the "UbuntuLTS" alias reaches its end of life. The "UbuntuLTS" will be removed with the breaking change release of Fall 2023.
+{
+  "fqdns": "",
+  "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Compute/virtualMachines/jenkins-get-started-vm",
+  "location": "westeurope",
+  "macAddress": "00-0D-3A-2A-DB-03",
+  "powerState": "VM running",
+  "privateIpAddress": "10.0.0.4",
+  "publicIpAddress": "52.136.201.13",
+  "resourceGroup": "jenkins-get-started-rg",
+  "zones": ""
+}
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$   az vm list -d -o table --query "[?name=='jenkins-get-started-vm']"
+Name                    Location    ProvisioningState    VmId                                  TimeCreated                       PowerState    PublicIps      Fqdns    PrivateIps    MacAddresses       ResourceGroup   
+----------------------  ----------  -------------------  ------------------------------------  --------------------------------  ------------  -------------  -------  ------------  -----------------  ----------------------
+jenkins-get-started-vm  westeurope  Succeeded            ad104c43-f523-4800-ba4a-6570350829ca  2023-09-13T08:25:56.254795+00:00  VM running    52.136.201.13           10.0.0.4      00-0D-3A-2A-DB-03  JENKINS-GET-STARTED-RG
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$   az vm open-port \
+>   --resource-group $rg \
+>   --name $vm  \
+>   --port 8080 --priority 1010
+{
+  "defaultSecurityRules": [
+    {
+      "access": "Allow",
+      "description": "Allow inbound traffic from all VMs in VNET",
+      "destinationAddressPrefix": "VirtualNetwork",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"c161c990-3cb0-4e43-8920-f5ad01ed406e\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/AllowVnetInBound",
+      "name": "AllowVnetInBound",
+      "priority": 65000,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "VirtualNetwork",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow inbound traffic from azure load balancer",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"c161c990-3cb0-4e43-8920-f5ad01ed406e\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+      "name": "AllowAzureLoadBalancerInBound",
+      "priority": 65001,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "AzureLoadBalancer",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Deny",
+      "description": "Deny all inbound traffic",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"c161c990-3cb0-4e43-8920-f5ad01ed406e\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/DenyAllInBound",
+      "name": "DenyAllInBound",
+      "priority": 65500,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+      "destinationAddressPrefix": "VirtualNetwork",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"c161c990-3cb0-4e43-8920-f5ad01ed406e\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/AllowVnetOutBound",
+      "name": "AllowVnetOutBound",
+      "priority": 65000,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "VirtualNetwork",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow outbound traffic from all VMs to Internet",
+      "destinationAddressPrefix": "Internet",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"c161c990-3cb0-4e43-8920-f5ad01ed406e\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/AllowInternetOutBound",
+      "name": "AllowInternetOutBound",
+      "priority": 65001,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Deny",
+      "description": "Deny all outbound traffic",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"c161c990-3cb0-4e43-8920-f5ad01ed406e\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/defaultSecurityRules/DenyAllOutBound",
+      "name": "DenyAllOutBound",
+      "priority": 65500,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    }
+  ],
+  "etag": "W/\"c161c990-3cb0-4e43-8920-f5ad01ed406e\"",
+  "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG",
+  "location": "westeurope",
+  "name": "jenkins-get-started-vmNSG",
+  "networkInterfaces": [
+    {
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkInterfaces/jenkins-get-started-vmVMNic",
+      "resourceGroup": "jenkins-get-started-rg"
+    }
+  ],
+  "provisioningState": "Succeeded",
+  "resourceGroup": "jenkins-get-started-rg",
+  "resourceGuid": "e4009d8d-eaac-4bed-9562-6d1c0acc7f1a",
+  "securityRules": [
+    {
+      "access": "Allow",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "22",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"c161c990-3cb0-4e43-8920-f5ad01ed406e\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/securityRules/default-allow-ssh",    
+      "name": "default-allow-ssh",
+      "priority": 1000,
+      "protocol": "Tcp",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules"
+    },
+    {
+      "access": "Allow",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "8080",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"c161c990-3cb0-4e43-8920-f5ad01ed406e\"",
+      "id": "/subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/jenkins-get-started-rg/providers/Microsoft.Network/networkSecurityGroups/jenkins-get-started-vmNSG/securityRules/open-port-8080",       
+      "name": "open-port-8080",
+      "priority": 1010,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "jenkins-get-started-rg",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules"
+    }
+  ],
+  "tags": {},
+  "type": "Microsoft.Network/networkSecurityGroups"
+}
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$ ip="$(az vm show \
+>   --resource-group $rg \
+>   --name $vm -d \
+>   --query [publicIps] \
+>   --output tsv)"
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$ echo $ip
+52.136.201.13
+
+pietr@BOOK-K71LSJSOIJ MINGW64 /c/dev/jenkins/jenkins-get-started
+$ ssh azureuser@$ip
+The authenticity of host '52.136.201.13 (52.136.201.13)' can't be established.
+ED25519 key fingerprint is SHA256:xXuBS3DV91GlbcXp/Nx1NzIQEZQdGq5rw053b90XWF4.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '52.136.201.13' (ED25519) to the list of known hosts.
+Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 5.4.0-1109-azure x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Wed Sep 13 08:27:09 UTC 2023
+
+  System load:  0.97              Processes:           123
+  Usage of /:   5.5% of 28.89GB   Users logged in:     0
+  Memory usage: 8%                IP address for eth0: 10.0.0.4
+  Swap usage:   0%
+
+Expanded Security Maintenance for Infrastructure is not enabled.
+
+0 updates can be applied immediately.
+
+68 additional security updates can be applied with ESM Infra.
+Learn more about enabling ESM Infra service for Ubuntu 18.04 at
+https://ubuntu.com/18-04
+
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+azureuser@jenkins-get-started-vm:~$ echo $ip
+
+azureuser@jenkins-get-started-vm:~$ service jenkins status
+Unit jenkins.service could not be found.
+azureuser@jenkins-get-started-vm:~$ service jenkins status
+● jenkins.service - Jenkins Continuous Integration Server
+   Loaded: loaded (/lib/systemd/system/jenkins.service; enabled; vendor preset: enabled)
+   Active: activating (start) since Wed 2023-09-13 08:27:49 UTC; 3s ago
+ Main PID: 6990 (java)
+    Tasks: 22 (limit: 4069)
+   CGroup: /system.slice/jenkins.service
+           └─6990 /usr/bin/java -Djava.awt.headless=true -jar /usr/share/java/jenkins.war --webroot=/var/cac
+
+Sep 13 08:27:49 jenkins-get-started-vm systemd[1]: Starting Jenkins Continuous Integration Server...        
+Sep 13 08:27:49 jenkins-get-started-vm jenkins[6990]: Running from: /usr/share/java/jenkins.war
+Sep 13 08:27:50 jenkins-get-started-vm jenkins[6990]: 2023-09-13 08:27:50.308+0000 [id=1]        INFO       
+4+0000 [id=1]        INFO
+Sep 13 08:27:52 jenkins-get-started-vm jenkins[6990]: 2023-09-13 08:27:52.895+0000 [id=1]        INFO       
+lines 9-15/15 (END)
+azureuser@jenkins-get-started-vm:~$ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+152a01b9cc034777a1785d2e733efa2a
+azureuser@jenkins-get-started-vm:~$
