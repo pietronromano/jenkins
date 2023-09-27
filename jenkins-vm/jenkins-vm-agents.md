@@ -5,8 +5,6 @@
 - Finally managed to get SSH passwordless auth to work: copied private key and known_hosts to Jenkins server, public key to the Node
 - Build with maven on the agent failed: even though installed and can run once logged in
 	Caused: java.io.IOException: Cannot run program "mvn" (in directory "/var/lib/jenkins/workspace/Spring - On Agent"): error=2, No such file or directory
-			
-
 
 # SEE jenkins-get-started for Az login 
 

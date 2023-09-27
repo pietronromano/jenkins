@@ -1,0 +1,22 @@
+# https://learn.microsoft.com/en-us/azure/aks/azure-csi-disk-storage-provision
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/provisioned-by: disk.csi.azure.com
+  name: pv-azuredisk
+  namespace: jenkins-ns  # Important to specify non-default namespace
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: managed-csi
+  csi:
+    driver: disk.csi.azure.com
+    readOnly: false
+    # Resource ID of previously created disk
+    volumeHandle: /subscriptions/26b58bc5-ccfe-48a9-b00e-51d89e19a4db/resourceGroups/MC_jenkins-aks-rg_pnrjenaks1_westeurope/providers/Microsoft.Compute/disks/jenkinsDisk
+    volumeAttributes:
+      fsType: ext4

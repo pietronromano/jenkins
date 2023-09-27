@@ -1,0 +1,14 @@
+# https://learn.microsoft.com/en-us/azure/aks/azure-csi-disk-storage-provision
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-azuredisk
+  namespace: jenkins-ns # Important to specify non-default namespace
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: pv-azuredisk
+  storageClassName: managed-csi

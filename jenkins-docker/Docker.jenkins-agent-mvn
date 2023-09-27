@@ -1,0 +1,16 @@
+FROM jenkins/inbound-agent:latest as build
+
+ARG MAVEN_VERSION=3.9.4
+ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
+USER jenkins
+
+## Adds maven to path, but doesn't work in the agent - seems to run with another identity, 
+RUN curl -fsSL -o apache-maven.tar.gz ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
+ && tar -xzf apache-maven.tar.gz \
+ && rm -f apache-maven.tar.gz \
+ && echo "export PATH=$PATH:/home/jenkins/apache-maven-${MAVEN_VERSION}/bin" >> ~/.bashrc
+
+ ## DIDN'T SOLVE THE PATH ISSUE
+ # && ln -s /home/jenkins/apache-maven-${MAVEN_VERSION}/bin/mvn mvn
+ 
+ 

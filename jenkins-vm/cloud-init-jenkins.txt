@@ -1,0 +1,41 @@
+#cloud-config
+package_upgrade: true
+
+# Docker
+# SOURCE: https://gist.github.com/HighwayofLife/076d3f026642fb14dbaad9f5847bc0ce
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg-agent
+  - software-properties-common
+
+# create the docker group
+groups:
+  - docker
+
+# Add default auto created user to docker group
+system_info:
+  default_user:
+    groups: [docker]
+
+# Install Docker, for production, consider pinning to stable versions
+runcmd:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+  - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - apt-get update -y
+  - apt-get install -y docker-ce docker-ce-cli containerd.io
+  - systemctl start docker
+  - systemctl enable docker
+
+# Jenkins
+  - sudo apt install openjdk-11-jre -y
+  - curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+  -  echo 'deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/' | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+  - sudo apt-get update && sudo apt-get install jenkins -y
+  - sudo usermod -a -G docker jenkins
+  - sudo service jenkins restart
+
+
+
+
