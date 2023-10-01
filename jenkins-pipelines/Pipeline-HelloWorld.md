@@ -2,9 +2,7 @@
 
 # Script
 pipeline {
-    # agent any
-    agent {label 'DockerAgent'}
-
+    agent any
     stages {
         stage('Hello') {
 

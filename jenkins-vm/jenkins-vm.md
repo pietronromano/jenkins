@@ -1,6 +1,6 @@
 # DATE: 13-09-2023
 # SOURCE: https://learn.microsoft.com/en-us/azure/developer/jenkins/configure-on-linux-vm
-# RESULT: SUCESS! Managed to created pipelines
+# RESULT: SUCESS! Managed to create pipelines
 
 # Create a virtual machine
 ## Create a test directory called jenkins-get-started.

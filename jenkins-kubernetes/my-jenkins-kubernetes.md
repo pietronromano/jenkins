@@ -2,7 +2,13 @@
 # SOURCE: https://www.jenkins.io/doc/book/installing/kubernetes
 # RESULTS: 
 - SUCCESS! Managed to setup cluster, with pv/pvc disks
-- AGENTS:
+- FAILURE: AGENTS: DIDN'T MANAGE TO SETUP AGENTS
+
+# Pipelines with Kubernetes
+## REFERENCES
+- https://www.hatica.io/blog/ci-cd-pipeline-with-jenkins-and-kubernetes/
+- https://plugins.jenkins.io/kubernetes/
+
 
 # Dir
     cd jenkins-kubernetes
@@ -134,10 +140,3 @@
     kubectl describe pod $jenkins_pod -n $ns
     IP: 10.244.0.12
 
-# Pipelines with Kubernetes
-## REFERENCES
-- https://www.hatica.io/blog/ci-cd-pipeline-with-jenkins-and-kubernetes/
-- https://plugins.jenkins.io/kubernetes/
-- https://www.youtube.com/watch?v=q4g7KJdFSn0&t=2726s
-    - https://github.com/dmancloud/complete-prodcution-e2e-pipeline
-    - https://github.com/dmancloud/gitops-complete-prodcution-e2e-pipeline
